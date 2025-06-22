@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: HMTL generated from lambda
+
+Globals:
+  Function:
+    Timeout: 5
+    Runtime: python3.12
+    MemorySize: 128
+
+Resources:
+  BocataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: FunctionName
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Role: !GetAtt LambdaRole.Arn
+      FunctionUrlConfig:
+        AuthType: NONE
+      Environment:
+        Variables:
+          BUCKET_NAME: "BucketName"
+          IMAGE_KEYS: "image"
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaRoleName
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AllowS3Presign
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: "arn:aws:s3:::BucketName/*"
